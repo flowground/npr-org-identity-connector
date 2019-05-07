@@ -1,0 +1,15 @@
+{
+    "type": "object",
+    "properties": {
+        "Authorization": {
+            "required": true,
+            "type": "string"
+        },
+        "requestBody": {
+            "items": {
+                "type": "integer"
+            },
+            "type": "array"
+        }
+    }
+}

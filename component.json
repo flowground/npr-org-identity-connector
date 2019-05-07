@@ -1,0 +1,139 @@
+{
+    "title": "NPR Identity Service",
+    "description": "The entry point to user-specific information",
+    "docsUrl": "https://dev.npr.org/guide/services/identity",
+    "url": "https://api.apis.guru/v2/specs/npr.org/identity/2/swagger.json",
+    "envVars": {
+        "OAUTH_CLIENT_ID": {
+            "description": "OAuth Client ID"
+        },
+        "OAUTH_CLIENT_SECRET": {
+            "description": "OAuth Client Secret"
+        }
+    },
+    "credentials": {
+        "fields": {
+            "server": {
+                "label": "Server",
+                "viewClass": "SelectView",
+                "model": [
+                    "https://identity.api.npr.org/",
+                    "--- Custom URL"
+                ],
+                "required": true
+            },
+            "otherServer": {
+                "label": "Custom Server URL",
+                "viewClass": "TextFieldView"
+            },
+            "oauth2": {
+                "label": "oauth2",
+                "viewClass": "OAuthFieldView"
+            }
+        },
+        "oauth2": {
+            "client_id": "{{OAUTH_CLIENT_ID}}",
+            "client_secret": "{{OAUTH_CLIENT_SECRET}}",
+            "auth_uri": "https://authorization.api.npr.org/v2/authorize",
+            "token_uri": "https://authorization.api.npr.org/v2/token"
+        }
+    },
+    "triggers": {
+        "startFlow": {
+            "main": "./lib/triggers/startFlow.js",
+            "type": "polling",
+            "title": "Start Flow",
+            "fields": {}
+        }
+    },
+    "actions": {
+        "postFollowing": {
+            "main": "./lib/actions/postFollowing.js",
+            "title": "Update the following status of the logged-in user for a particular aggregation",
+            "description": "After a successful call, this returns a User document with an updated list of affiliations.",
+            "fields": {
+                "verbose": {
+                    "viewClass": "CheckBoxView",
+                    "label": "Debug this step (log more data)"
+                },
+                "body_content_type": {
+                    "viewClass": "SelectView",
+                    "label": "Body Content-Type",
+                    "required": true,
+                    "prompt": "Choose a body Content-Type.",
+                    "model": {
+                        "application/json": "application/json",
+                        "application/vnd.collection.doc+json": "application/vnd.collection.doc+json"
+                    }
+                }
+            },
+            "metadata": {
+                "in": "./lib/schemas/postFollowing.in.json",
+                "out": {
+                    "type": "object"
+                }
+            }
+        },
+        "updateStations": {
+            "main": "./lib/actions/updateStations.js",
+            "title": "Update the logged-in user's favorite station(s)",
+            "description": "Right now, only the primary station can be changed. Previously selected stations will not be deleted, but the new station will be moved to first in the array.",
+            "fields": {
+                "verbose": {
+                    "viewClass": "CheckBoxView",
+                    "label": "Debug this step (log more data)"
+                },
+                "body_content_type": {
+                    "viewClass": "SelectView",
+                    "label": "Body Content-Type",
+                    "required": true,
+                    "prompt": "Choose a body Content-Type.",
+                    "model": {
+                        "application/json": "application/json",
+                        "application/vnd.collection.doc+json": "application/vnd.collection.doc+json"
+                    }
+                }
+            },
+            "metadata": {
+                "in": "./lib/schemas/updateStations.in.json",
+                "out": {
+                    "type": "object"
+                }
+            }
+        },
+        "getUser": {
+            "main": "./lib/actions/getUser.js",
+            "title": "Get the latest state information about the logged-in user",
+            "description": "After a successful login, the client should send a `GET` call approximately once an hour to refresh the user data.",
+            "fields": {
+                "verbose": {
+                    "viewClass": "CheckBoxView",
+                    "label": "Debug this step (log more data)"
+                }
+            },
+            "metadata": {
+                "in": "./lib/schemas/getUser.in.json",
+                "out": {
+                    "type": "object"
+                }
+            }
+        },
+        "inheritFromTempUser": {
+            "main": "./lib/actions/inheritFromTempUser.js",
+            "title": "Copy listening data from a temporary user account to the logged-in user's account",
+            "description": "This can and should only be used by clients who have access to the `temporary_user` grant type.\n    Third-party developers do not have access to this grant type by default, and will not need this endpoint.",
+            "fields": {
+                "verbose": {
+                    "viewClass": "CheckBoxView",
+                    "label": "Debug this step (log more data)"
+                }
+            },
+            "metadata": {
+                "in": "./lib/schemas/inheritFromTempUser.in.json",
+                "out": {
+                    "type": "object"
+                }
+            }
+        }
+    }
+}
